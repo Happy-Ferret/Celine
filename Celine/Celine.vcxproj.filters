@@ -16,6 +16,9 @@
     <Filter Include="README">
       <UniqueIdentifier>{cf9a99ae-3248-470c-a4f1-bbd4e91e9a88}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Build Files">
+      <UniqueIdentifier>{500c47d7-21e7-4119-83c1-59b064d87bc7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\LICENSE">
@@ -24,5 +27,14 @@
     <None Include="..\README.md">
       <Filter>README</Filter>
     </None>
+    <None Include="Celine.licenseheader" />
+    <None Include="..\Build Files\CopyDLLsToCorrectBuildFolder.bat">
+      <Filter>Build Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

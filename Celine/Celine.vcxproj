@@ -69,23 +69,24 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SolutionDir)Dependencies\freeglut\include\;$(SolutionDir)Dependencies\glew\include\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>$(SolutionDir)Dependencies\freeglut\lib\;$(SolutionDir)Dependencies\glew\lib\;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
+    <ExtensionsToDeleteOnClean>*.dll;*.cdf;*.cache;*.obj;*.ilk;*.resources;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;*.meta;*.tlog;*.manifest;*.res;*.pch;*.exp;*.idb;*.rep;*.xdc;*.pdb;*_manifest.rc;*.bsc;*.sbr;*.xml;*.metagen;*.bi</ExtensionsToDeleteOnClean>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SolutionDir)Dependencies\freeglut\include\;$(SolutionDir)Dependencies\glew\include\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>$(SolutionDir)Dependencies\freeglut\lib\x64\;$(SolutionDir)Dependencies\glew\lib\x64\;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);</LibraryPath>
-    <ExcludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(MSBuild_ExecutablePath);</ExcludePath>
+    <ExtensionsToDeleteOnClean>*.dll;*.cdf;*.cache;*.obj;*.ilk;*.resources;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;*.meta;*.tlog;*.manifest;*.res;*.pch;*.exp;*.idb;*.rep;*.xdc;*.pdb;*_manifest.rc;*.bsc;*.sbr;*.xml;*.metagen;*.bi</ExtensionsToDeleteOnClean>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH)</ExecutablePath>
     <IncludePath>$(SolutionDir)Dependencies\freeglut\include\;$(SolutionDir)Dependencies\glew\include\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>$(SolutionDir)Dependencies\freeglut\lib\;$(SolutionDir)Dependencies\glew\lib\;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
+    <ExtensionsToDeleteOnClean>*.dll;*.cdf;*.cache;*.obj;*.ilk;*.resources;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;*.meta;*.tlog;*.manifest;*.res;*.pch;*.exp;*.idb;*.rep;*.xdc;*.pdb;*_manifest.rc;*.bsc;*.sbr;*.xml;*.metagen;*.bi</ExtensionsToDeleteOnClean>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)Dependencies\freeglut\include\;$(SolutionDir)Dependencies\glew\include\;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>$(SolutionDir)Dependencies\freeglut\lib\x64\;$(SolutionDir)Dependencies\glew\lib\x64\;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);</LibraryPath>
-    <ExcludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(MSBuild_ExecutablePath);</ExcludePath>
+    <ExtensionsToDeleteOnClean>*.dll;*.cdf;*.cache;*.obj;*.ilk;*.resources;*.tlb;*.tli;*.tlh;*.tmp;*.rsp;*.pgc;*.pgd;*.meta;*.tlog;*.manifest;*.res;*.pch;*.exp;*.idb;*.rep;*.xdc;*.pdb;*_manifest.rc;*.bsc;*.sbr;*.xml;*.metagen;*.bi</ExtensionsToDeleteOnClean>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -105,7 +106,7 @@
     </Link>
     <PostBuildEvent>
       <Command>"$(SolutionDir)Build Files\CopyDLLsToCorrectBuildFolder.bat" "$(SolutionDir)" "$(Configuration)" "$(Platform)"</Command>
-      <Message>Copies the appropriate Opengl dlls to the Current Platform and Configuration folder</Message>
+      <Message>Copies the appropriate Opengl dlls to the folder corresponding to the current Platform and Configuration combination</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -126,7 +127,7 @@
     </Link>
     <PostBuildEvent>
       <Command>"$(SolutionDir)Build Files\CopyDLLsToCorrectBuildFolder.bat" "$(SolutionDir)" "$(Configuration)" "$(Platform)"</Command>
-      <Message>Copies the appropriate Opengl dlls to the Current Platform and Configuration folder</Message>
+      <Message>Copies the appropriate Opengl dlls to the folder corresponding to the current Platform and Configuration combination</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -152,7 +153,7 @@
     </Link>
     <PostBuildEvent>
       <Command>"$(SolutionDir)Build Files\CopyDLLsToCorrectBuildFolder.bat" "$(SolutionDir)" "$(Configuration)" "$(Platform)"</Command>
-      <Message>Copies the appropriate Opengl dlls to the Current Platform and Configuration folder</Message>
+      <Message>Copies the appropriate Opengl dlls to the folder corresponding to the current Platform and Configuration combination</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -178,7 +179,7 @@
     </Link>
     <PostBuildEvent>
       <Command>"$(SolutionDir)Build Files\CopyDLLsToCorrectBuildFolder.bat" "$(SolutionDir)" "$(Configuration)" "$(Platform)"</Command>
-      <Message>Copies the appropriate Opengl dlls to the Current Platform and Configuration folder</Message>
+      <Message>Copies the appropriate Opengl dlls to the folder corresponding to the current Platform and Configuration combination</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -13,5 +13,16 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="README">
+      <UniqueIdentifier>{cf9a99ae-3248-470c-a4f1-bbd4e91e9a88}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Filter>README</Filter>
+    </None>
+    <None Include="..\README.md">
+      <Filter>README</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -1,16 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+
 <!--
 /////////////////////////////////////////////////////////////////////////////
 // Name:        	Release_Win32.props
 // Author:      	Nikolaos Patsiouras
-// Email:			    npatsiouras@gmail.com
-// Created:     	2015, 1, 15, 8:58 PM
+// Email:			npatsiouras@gmail.com
+// Created:     	2015, 1, 15, 6:09 PM
 // Modified by:		Nikos
-// Last Modified: 2015, 1, 15, 8:58 PM
+// Last Modified:   2015, 1, 15, 10:17 PM
 // Copyright:   	(c) 2015 Nikolaos Patsiouras
 // Licence:     	MIT License
 /////////////////////////////////////////////////////////////////////////////
 -->
+
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />

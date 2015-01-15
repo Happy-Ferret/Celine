@@ -3,23 +3,37 @@ extensions: .cs .cpp .h .c
 /////////////////////////////////////////////////////////////////////////////
 // Name:        	%FileName%
 // Purpose:     
-// Author:      	%UserName%
+// Author:      	Nikolaos Patsiouras
+// Email:			npatsiouras@gmail.com
 // Created:     	%CreationYear%, %CreationMonth%, %CreationDay%, %CreationTime%
 // Modified by:		%UserName%
 // Last Modified:   %CurrentYear%, %CurrentMonth%, %CurrentDay%, %CurrentTime%
-// Copyright:   	(c) %CreationYear% %UserName%
+// Copyright:   	(c) %CreationYear% Nikolaos Patsiouras
 // Licence:     	MIT License
 /////////////////////////////////////////////////////////////////////////////
-extensions:  .xml .config .xsd
+extensions:  .xml .config .xsd .props
 <!--
 /////////////////////////////////////////////////////////////////////////////
 // Name:        	%FileName%
-// Purpose:     
-// Author:      	%UserName%
+// Author:      	Nikolaos Patsiouras
+// Email:			npatsiouras@gmail.com
 // Created:     	%CreationYear%, %CreationMonth%, %CreationDay%, %CreationTime%
 // Modified by:		%UserName%
 // Last Modified:   %CurrentYear%, %CurrentMonth%, %CurrentDay%, %CurrentTime%
-// Copyright:   	(c) %CreationYear% %UserName%
+// Copyright:   	(c) %CreationYear% Nikolaos Patsiouras
 // Licence:     	MIT License
 /////////////////////////////////////////////////////////////////////////////
 -->
+extensions:  .bat
+goto comment
+/////////////////////////////////////////////////////////////////////////////
+// Name:        	%FileName%
+// Author:      	Nikolaos Patsiouras
+// Email:			npatsiouras@gmail.com
+// Created:     	%CreationYear%, %CreationMonth%, %CreationDay%, %CreationTime%
+// Modified by:		%UserName%
+// Last Modified:   %CurrentYear%, %CurrentMonth%, %CurrentDay%, %CurrentTime%
+// Copyright:   	(c) %CreationYear% Nikolaos Patsiouras
+// Licence:     	MIT License
+/////////////////////////////////////////////////////////////////////////////
+:comment

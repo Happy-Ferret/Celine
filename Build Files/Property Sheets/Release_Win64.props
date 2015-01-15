@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+/////////////////////////////////////////////////////////////////////////////
+// Name:        	Release_Win64.props
+// Author:      	Nikolaos Patsiouras
+// Email:			    npatsiouras@gmail.com
+// Created:     	2015, 1, 15, 8:58 PM
+// Modified by:		Nikos
+// Last Modified: 2015, 1, 15, 8:58 PM
+// Copyright:   	(c) 2015 Nikolaos Patsiouras
+// Licence:     	MIT License
+/////////////////////////////////////////////////////////////////////////////
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_PropertySheetDisplayName>Release|Win64</_PropertySheetDisplayName>
+    <IncludePath>$(SolutionDir)Dependencies\freeglut\include\;$(SolutionDir)Dependencies\glew\include\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)Dependencies\freeglut\lib\x64\;$(SolutionDir)Dependencies\glew\lib\x64\;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <SDLCheck>true</SDLCheck>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Command>"$(SolutionDir)Build Files\Post-Build\ImportThirdPartyLibraries_Post.bat" "$(SolutionDir)" "$(Configuration)" "$(Platform)"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copies the appropriate 3rd party dlls to the folder corresponding to the current Platform and Configuration combination</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>

@@ -17,7 +17,13 @@
       <UniqueIdentifier>{cf9a99ae-3248-470c-a4f1-bbd4e91e9a88}</UniqueIdentifier>
     </Filter>
     <Filter Include="Build Files">
-      <UniqueIdentifier>{500c47d7-21e7-4119-83c1-59b064d87bc7}</UniqueIdentifier>
+      <UniqueIdentifier>{df1af5f1-5ae6-400e-afdc-7731dbf06af1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Build Files\Post-Build">
+      <UniqueIdentifier>{f227d054-22fd-444c-b148-8f6efb48b7c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Build Files\Property Sheets">
+      <UniqueIdentifier>{a525e0c0-716c-4df5-ab3b-85d322b0b29c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -28,8 +34,20 @@
       <Filter>README</Filter>
     </None>
     <None Include="Celine.licenseheader" />
-    <None Include="..\Build Files\CopyDLLsToCorrectBuildFolder.bat">
-      <Filter>Build Files</Filter>
+    <None Include="..\Build Files\Post-Build\ImportThirdPartyLibraries_Post.bat">
+      <Filter>Build Files\Post-Build</Filter>
+    </None>
+    <None Include="..\Build Files\Property Sheets\Debug_Win32.props">
+      <Filter>Build Files\Property Sheets</Filter>
+    </None>
+    <None Include="..\Build Files\Property Sheets\Debug_Win64.props">
+      <Filter>Build Files\Property Sheets</Filter>
+    </None>
+    <None Include="..\Build Files\Property Sheets\Release_Win32.props">
+      <Filter>Build Files\Property Sheets</Filter>
+    </None>
+    <None Include="..\Build Files\Property Sheets\Release_Win64.props">
+      <Filter>Build Files\Property Sheets</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

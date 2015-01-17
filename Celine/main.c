@@ -25,11 +25,18 @@ typedef struct
 	float RGBA[4];
 } Vertex;
 
-int CurrentWidth = 800,
+typedef enum GeometryRenderState
+{
+	NORMAL,
+	INDIVIDUAL_SPOKE
+} GeometryRenderState;
+
+int CurrentWidth = 600,
 CurrentHeight = 600,
 WindowHandle = 0;
 unsigned FrameCount = 0;
-GLuint VertexShaderId = 0, FragmentShaderId = 0, ProgramId = 0, VaoId = 0, VboId = 0, ColorBufferId = 0;
+GLuint VertexShaderId = 0, FragmentShaderId = 0, ProgramId = 0, VaoId = 0, VboId = 0, IndexBufferId[5];
+GeometryRenderState state = NORMAL;
 
 const GLchar* VertexShader =
 {
@@ -65,6 +72,7 @@ void ResizeFunction( int, int );
 void RenderFunction( void );
 void TimerFunction( int );
 void IdleFunction( void );
+void KeyboardFunction( unsigned char, int, int );
 void Cleanup( void );
 void CreateVBO( void );
 void DestroyVBO( void );
@@ -132,6 +140,7 @@ void InitWindow( int argc, char* argv[] )
 	glutIdleFunc( IdleFunction );
 	glutTimerFunc( 0, TimerFunction, 0 );
 	glutCloseFunc( Cleanup );
+	glutKeyboardFunc( KeyboardFunction );
 }
 void ResizeFunction( int Width, int Height )
 {
@@ -142,7 +151,15 @@ void ResizeFunction( int Width, int Height )
 void RenderFunction( void )
 {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glDrawArrays( GL_TRIANGLES, 0, 3 );
+	if ( state == NORMAL )
+	{
+		glDrawElements( GL_TRIANGLES, 48, GL_UNSIGNED_BYTE, NULL );
+	}
+	else if ( state == INDIVIDUAL_SPOKE )
+	{
+		glDrawElements( GL_TRIANGLES, 12, GL_UNSIGNED_BYTE, NULL );
+	}
+	
 	glutSwapBuffers();
 	++FrameCount;
 }
@@ -182,26 +199,83 @@ void Cleanup( void )
 
 void CreateVBO( void )
 {
-	/*GLfloat Vertices[] = {
-		-0.2f, 0.8f, 0.0f, 1.0f,
-		0.2f, 0.8f, 0.0f, 1.0f,
-		-0.2f, -0.8f, 0.0f, 1.0f,
-		0.2f, -0.8f, 0.0f, 1.0f
-	};
-
-	GLfloat Colors[] = {
-		1.0f, 0.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f
-	};*/
 	Vertex Vertices[] =
 	{
-		{ { -0.8f, -0.8f, 0.0f, 1.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
-		{ { 0.0f, 0.8f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
-		{ { 0.8f, -0.8f, 0.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } }
+		//Origin
+		{ { 0.0f, 0.0f, 0.0f, 1.0f }, { 1.0f, 1.0f, 1.0f, 1.0f } },
+		// Top
+		{ { -0.2f, 0.8f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+		{ { 0.2f, 0.8f, 0.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
+		{ { 0.0f, 0.8f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f, 1.0f } },
+		{ { 0.0f, 1.0f, 0.0f, 1.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
+		// Bottom
+		{ { -0.2f, -0.8f, 0.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
+		{ { 0.2f, -0.8f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+		{ { 0.0f, -0.8f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f, 1.0f } },
+		{ { 0.0f, -1.0f, 0.0f, 1.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
+		// Left
+		{ { -0.8f, -0.2f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+		{ { -0.8f, 0.2f, 0.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
+		{ { -0.8f, 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f, 1.0f } },
+		{ { -1.0f, 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
+		// Right
+		{ { 0.8f, -0.2f, 0.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } },
+		{ { 0.8f, 0.2f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+		{ { 0.8f, 0.0f, 0.0f, 1.0f }, { 0.0f, 1.0f, 1.0f, 1.0f } },
+		{ { 1.0f, 0.0f, 0.0f, 1.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } }
 	};
 
+	GLubyte Indices[] = {
+		// Top
+		0, 1, 3,
+		0, 3, 2,
+		3, 1, 4,
+		3, 4, 2,
+		// Bottom
+		0, 5, 7,
+		0, 7, 6,
+		7, 5, 8,
+		7, 8, 6,
+		// Left
+		0, 9, 11,
+		0, 11, 10,
+		11, 9, 12,
+		11, 12, 10,
+		// Right
+		0, 13, 15,
+		0, 15, 14,
+		15, 13, 16,
+		15, 16, 14
+	};
+
+	GLubyte TopIndices[] = {
+		// Top
+		0, 1, 3,
+		0, 3, 2,
+		3, 1, 4,
+		3, 4, 2
+	};
+	GLubyte LeftIndices[] = {
+		// Left
+		0, 9, 11,
+		0, 11, 10,
+		11, 9, 12,
+		11, 12, 10
+	};
+	GLubyte RightIndices[] = {
+		// Right
+		0, 13, 15,
+		0, 15, 14,
+		15, 13, 16,
+		15, 16, 14
+	};
+	GLubyte BottomIndices[] = {
+		// Bottom
+		0, 5, 7,
+		0, 7, 6,
+		7, 5, 8,
+		7, 8, 6
+	};
 
 	GLenum ErrorCheckValue = glGetError();
 	const GLsizei BufferSize = sizeof( Vertices );
@@ -213,7 +287,6 @@ void CreateVBO( void )
 
 	glGenBuffers( 1, &VboId );
 	glBindBuffer( GL_ARRAY_BUFFER, VboId );
-	//glBufferData( GL_ARRAY_BUFFER, sizeof( Vertices ), Vertices, GL_STATIC_DRAW );
 	glBufferData( GL_ARRAY_BUFFER, BufferSize, Vertices, GL_STATIC_DRAW );
 	
 	glVertexAttribPointer( 0, 4, GL_FLOAT, GL_FALSE, VertexSize, 0 );
@@ -222,11 +295,20 @@ void CreateVBO( void )
 	glEnableVertexAttribArray( 0 );
 	glEnableVertexAttribArray( 1 );
 
-	/*glGenBuffers( 1, &ColorBufferId );
-	glBindBuffer( GL_ARRAY_BUFFER, ColorBufferId );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( Colors ), Colors, GL_STATIC_DRAW );
-	glVertexAttribPointer( 1, 4, GL_FLOAT, GL_FALSE, 0, 0 );
-	glEnableVertexAttribArray( 1 );*/
+	glGenBuffers( 5, IndexBufferId );
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IndexBufferId[0] );
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( Indices ), Indices, GL_STATIC_DRAW );
+
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IndexBufferId[1] );
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( TopIndices ), TopIndices, GL_STATIC_DRAW );
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IndexBufferId[2] );
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( LeftIndices ), LeftIndices, GL_STATIC_DRAW );
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IndexBufferId[3] );
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( RightIndices ), RightIndices, GL_STATIC_DRAW );
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IndexBufferId[4] );
+	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( BottomIndices ), BottomIndices, GL_STATIC_DRAW );
+
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IndexBufferId[0] );
 
 	ErrorCheckValue = glGetError();
 	if ( ErrorCheckValue != GL_NO_ERROR )
@@ -249,8 +331,10 @@ void DestroyVBO( void )
 	glDisableVertexAttribArray( 0 );
 
 	glBindBuffer( GL_ARRAY_BUFFER, 0 );
-	//glDeleteBuffers( 1, &ColorBufferId );
 	glDeleteBuffers( 1, &VboId );
+
+	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, 0 );
+	glDeleteBuffers( 5, IndexBufferId );
 
 	glBindVertexArray( 0 );
 	glDeleteVertexArrays( 1, &VaoId );
@@ -323,5 +407,69 @@ void DestroyShaders( void )
 			);
 
 		exit( -1 );
+	}
+}
+
+void KeyboardFunction( unsigned char Key, int X, int Y )
+{
+	switch ( Key )
+	{
+		//Displays as wireframe
+		case 'W':
+		case 'w':
+			{
+				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+				break;
+			}
+		//Displays as filled
+		case 'F':
+		case 'f':
+			{
+				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+				break;
+			}
+		//Displays only the top spoke 
+		case 'T':
+		case 't':
+			{
+				state = INDIVIDUAL_SPOKE;
+				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IndexBufferId[1] );
+				break;
+			}
+		//Displays only the left spoke
+		case 'L':
+		case 'l':
+			{
+				state = INDIVIDUAL_SPOKE;
+				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IndexBufferId[2] );
+				break;
+			}
+		//Displays only the right spoke
+		case 'R':
+		case 'r':
+			{
+				state = INDIVIDUAL_SPOKE;
+				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IndexBufferId[3] );
+				break;
+			}
+		//Displays only the bottom spoke
+		case 'B':
+		case 'b':
+			{
+				state = INDIVIDUAL_SPOKE;
+				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IndexBufferId[4] );
+				break;
+			}
+		//Displays only the bottom spoke
+		case 'N':
+		case 'n':
+			{
+				state = NORMAL;
+				glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IndexBufferId[0] );
+				break;
+			}
+		default:
+			X;Y;
+			break;
 	}
 }

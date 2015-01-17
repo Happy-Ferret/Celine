@@ -19,6 +19,12 @@
 
 #define WINDOW_TITLE_PREFIX "OpenGLPrimer"
 
+typedef struct
+{
+	float XYZW[4];
+	float RGBA[4];
+} Vertex;
+
 int CurrentWidth = 800,
 CurrentHeight = 600,
 WindowHandle = 0;
@@ -136,7 +142,7 @@ void ResizeFunction( int Width, int Height )
 void RenderFunction( void )
 {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+	glDrawArrays( GL_TRIANGLES, 0, 3 );
 	glutSwapBuffers();
 	++FrameCount;
 }
@@ -176,7 +182,7 @@ void Cleanup( void )
 
 void CreateVBO( void )
 {
-	GLfloat Vertices[] = {
+	/*GLfloat Vertices[] = {
 		-0.2f, 0.8f, 0.0f, 1.0f,
 		0.2f, 0.8f, 0.0f, 1.0f,
 		-0.2f, -0.8f, 0.0f, 1.0f,
@@ -188,24 +194,39 @@ void CreateVBO( void )
 		0.0f, 1.0f, 0.0f, 1.0f,
 		0.0f, 0.0f, 1.0f, 1.0f,
 		1.0f, 1.0f, 1.0f, 1.0f
+	};*/
+	Vertex Vertices[] =
+	{
+		{ { -0.8f, -0.8f, 0.0f, 1.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },
+		{ { 0.0f, 0.8f, 0.0f, 1.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },
+		{ { 0.8f, -0.8f, 0.0f, 1.0f }, { 0.0f, 0.0f, 1.0f, 1.0f } }
 	};
 
+
 	GLenum ErrorCheckValue = glGetError();
+	const GLsizei BufferSize = sizeof( Vertices );
+	const GLsizei VertexSize = sizeof( Vertices[0] );
+	const GLsizei RgbOffset = sizeof( Vertices[0].XYZW );
 
 	glGenVertexArrays( 1, &VaoId );
 	glBindVertexArray( VaoId );
 
 	glGenBuffers( 1, &VboId );
 	glBindBuffer( GL_ARRAY_BUFFER, VboId );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( Vertices ), Vertices, GL_STATIC_DRAW );
-	glVertexAttribPointer( 0, 4, GL_FLOAT, GL_FALSE, 0, 0 );
-	glEnableVertexAttribArray( 0 );
+	//glBufferData( GL_ARRAY_BUFFER, sizeof( Vertices ), Vertices, GL_STATIC_DRAW );
+	glBufferData( GL_ARRAY_BUFFER, BufferSize, Vertices, GL_STATIC_DRAW );
+	
+	glVertexAttribPointer( 0, 4, GL_FLOAT, GL_FALSE, VertexSize, 0 );
+	glVertexAttribPointer( 1, 4, GL_FLOAT, GL_FALSE, VertexSize, (GLvoid*)RgbOffset );
 
-	glGenBuffers( 1, &ColorBufferId );
+	glEnableVertexAttribArray( 0 );
+	glEnableVertexAttribArray( 1 );
+
+	/*glGenBuffers( 1, &ColorBufferId );
 	glBindBuffer( GL_ARRAY_BUFFER, ColorBufferId );
 	glBufferData( GL_ARRAY_BUFFER, sizeof( Colors ), Colors, GL_STATIC_DRAW );
 	glVertexAttribPointer( 1, 4, GL_FLOAT, GL_FALSE, 0, 0 );
-	glEnableVertexAttribArray( 1 );
+	glEnableVertexAttribArray( 1 );*/
 
 	ErrorCheckValue = glGetError();
 	if ( ErrorCheckValue != GL_NO_ERROR )
@@ -228,7 +249,7 @@ void DestroyVBO( void )
 	glDisableVertexAttribArray( 0 );
 
 	glBindBuffer( GL_ARRAY_BUFFER, 0 );
-	glDeleteBuffers( 1, &ColorBufferId );
+	//glDeleteBuffers( 1, &ColorBufferId );
 	glDeleteBuffers( 1, &VboId );
 
 	glBindVertexArray( 0 );

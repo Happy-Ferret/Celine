@@ -49,10 +49,24 @@
     <None Include="..\Build Files\Property Sheets\Release_Win64.props">
       <Filter>Build Files\Property Sheets</Filter>
     </None>
+    <None Include="SimpleShader.vertex.glsl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="SimpleShader.fragment.glsl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Utils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Utils.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

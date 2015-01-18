@@ -150,9 +150,15 @@
     <None Include="..\LICENSE" />
     <None Include="..\README.md" />
     <None Include="Celine.licenseheader" />
+    <None Include="SimpleShader.fragment.glsl" />
+    <None Include="SimpleShader.vertex.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
+    <ClCompile Include="Utils.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

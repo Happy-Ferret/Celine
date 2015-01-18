@@ -43,6 +43,7 @@ int main( int argc, char* argv[] )
 	glutMainLoop();
 	exit( EXIT_SUCCESS );
 }
+
 void Initialize( int argc, char* argv[] )
 {
 	GLenum GlewInitResult;

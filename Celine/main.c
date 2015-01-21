@@ -1,43 +1,38 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        	main.c
+// Name:        	Test.c
 // Purpose:     
 // Author:      	Nikolaos Patsiouras
 // Email:			npatsiouras@gmail.com
-// Created:     	2015, 1, 14, 1:35 PM
+// Created:     	2015, 1, 19, 2:32 PM
 // Modified by:		Nikos
-// Last Modified:   2015, 1, 16, 5:55 PM
+// Last Modified:   2015, 1, 19, 2:32 PM
 // Copyright:   	(c) 2015 Nikolaos Patsiouras
 // Licence:     	MIT License
 /////////////////////////////////////////////////////////////////////////////
 
 #include "Utils.h"
 
-#define WINDOW_TITLE_PREFIX "OpenGLPrimer"
+#define WINDOW_TITLE_PREFIX "TestWindow"
 
-int CurrentWidth = 600,
-CurrentHeight = 600,
-WindowHandle = 0;
-unsigned FrameCount = 0;
-GLuint ProjectionMatrixUniformLocation, ViewMatrixUniformLocation, ModelMatrixUniformLocation, BufferIds[3] = { 0 }, ShaderIds[3] = { 0 };
+int WindowHandle = 0, CurrentWidth = 600, CurrentHeight = 600;
+
 Matrix ProjectionMatrix, ViewMatrix, ModelMatrix;
-float CubeRotation = 0;
-clock_t LastTime = 0;
+
+GLuint VAO_Ids[1] = { 0 },
+		VBO_Ids[2] = { 0 },
+		ShaderProgram_Ids[1] = { 0 },
+		Shader_Ids[2] = { 0 },
+		TBO_Ids[1] = { 0 };
 
 void Initialize( int, char*[] );
 void InitWindow( int, char*[] );
-void ResizeFunction( int, int );
 void RenderFunction( void );
-void TimerFunction( int );
-void IdleFunction( void );
+void ResizeFunction( int, int );
 void KeyboardFunction( unsigned char, int, int );
-void CreateCube( void );
-void DestroyCube( void );
-void DrawCube( void );
-void Cleanup( void );
-void CreateShaders( void );
-void DestroyShaders( void );
+void LoadShaders();
+void LoadMesh();
 
-int main( int argc, char* argv[] )
+int main( int argc, char** argv )
 {
 	Initialize( argc, argv );
 	glutMainLoop();
@@ -46,13 +41,11 @@ int main( int argc, char* argv[] )
 
 void Initialize( int argc, char* argv[] )
 {
-	GLenum GlewInitResult;
-
+	//Initialize FREEGLUT and CREATE A WINDOW
 	InitWindow( argc, argv );
 
-	glewExperimental = GL_TRUE; //GLEW probes the graphics driver for some info and in case it's an experimental/pre-release driver we need this set to avoid exceptions.
-	GlewInitResult = glewInit();
-
+	//Initialize GLEW
+	GLenum GlewInitResult = glewInit();
 	if ( GLEW_OK != GlewInitResult )
 	{
 		fprintf(
@@ -62,43 +55,42 @@ void Initialize( int argc, char* argv[] )
 			);
 		exit( EXIT_FAILURE );
 	}
-
 	fprintf(
 		stdout,
 		"INFO: OpenGL Version: %s\n",
 		glGetString( GL_VERSION )
 		);
-
+	
+	//Clear the error collection
 	glGetError();
 
+	//Set the clear color to be black which also seems to be the default
 	glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
-
-	glEnable( GL_DEPTH_TEST );
-	glDepthFunc( GL_LESS );
-	ExitOnGLError( "ERROR: Could not set OpenGL depth testing options" );
-
-	glEnable( GL_CULL_FACE );
-	glCullFace( GL_BACK );
-	glFrontFace( GL_CCW );
-	ExitOnGLError( "ERROR: Could not set OpenGL culling options" );
 
 	ModelMatrix = IDENTITY_MATRIX;
 	ProjectionMatrix = IDENTITY_MATRIX;
 	ViewMatrix = IDENTITY_MATRIX;
-	TranslateMatrix( &ViewMatrix, 0, 0, -2 );
 
-	CreateCube();
+	//Load shaders
+	LoadShaders();
+	//Load Mesh
+	LoadMesh();
+	//Load textures
 }
+
 void InitWindow( int argc, char* argv[] )
 {
 	glutInit( &argc, argv );
 	glutInitContextVersion( 4, 0 );
-	glutInitContextFlags( GLUT_FORWARD_COMPATIBLE );
 	glutInitContextProfile( GLUT_CORE_PROFILE );
+	glutInitContextFlags( GLUT_FORWARD_COMPATIBLE );
+
 	glutSetOption(
 		GLUT_ACTION_ON_WINDOW_CLOSE,
 		GLUT_ACTION_GLUTMAINLOOP_RETURNS
 		);
+
+
 	glutInitWindowSize( CurrentWidth, CurrentHeight );
 	glutInitDisplayMode( GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA );
 	WindowHandle = glutCreateWindow( WINDOW_TITLE_PREFIX );
@@ -110,199 +102,140 @@ void InitWindow( int argc, char* argv[] )
 			);
 		exit( EXIT_FAILURE );
 	}
+
 	glutReshapeFunc( ResizeFunction );
 	glutDisplayFunc( RenderFunction );
-	glutIdleFunc( IdleFunction );
-	glutTimerFunc( 0, TimerFunction, 0 );
-	glutCloseFunc( DestroyCube );
 	glutKeyboardFunc( KeyboardFunction );
 }
+
+void RenderFunction()
+{
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+	glutSwapBuffers();
+	glutPostRedisplay();
+}
+
 void ResizeFunction( int Width, int Height )
 {
 	CurrentWidth = Width;
 	CurrentHeight = Height;
 	glViewport( 0, 0, CurrentWidth, CurrentHeight );
-
-	ProjectionMatrix =
-		CreateProjectionMatrix(
-		60,
-		(float)CurrentWidth / CurrentHeight,
-		1.0f,
-		100.0f
-		);
-
-	glUseProgram( ShaderIds[0] );
-	glUniformMatrix4fv( ProjectionMatrixUniformLocation, 1, GL_FALSE, ProjectionMatrix.m );
-	glUseProgram( 0 );
-}
-void RenderFunction( void )
-{
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	DrawCube();
-	glutSwapBuffers();
-	++FrameCount;
-}
-void IdleFunction( void )
-{
-	glutPostRedisplay();
 }
 
-void TimerFunction( int Value )
-{
-	if ( 0 != Value )
-	{
-		char* TempString = (char*)
-			malloc( 512 + strlen( WINDOW_TITLE_PREFIX ) );
-
-		sprintf(
-			TempString,
-			"%s: %d Frames Per Second @ %d x %d",
-			WINDOW_TITLE_PREFIX,
-			FrameCount * 4,
-			CurrentWidth,
-			CurrentHeight
-			);
-
-		glutSetWindowTitle( TempString );
-		free( TempString );
-	}
-	FrameCount = 0;
-	glutTimerFunc( 250, TimerFunction, 1 );
-}
-
-void KeyboardFunction( unsigned char Key, int X, int Y )
+void KeyboardFunction( unsigned char Key, int MouseX, int MouseY )
 {
 	switch ( Key )
 	{
-		//Displays as wireframe
-		case 'W':
-		case 'w':
-			{
-				glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-				break;
-			}
-		//Displays as filled
 		case 'F':
 		case 'f':
 			{
-				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-				break;
+				glutFullScreenToggle();
 			}
-		default:
-			X;Y;
 			break;
+		default:
+			MouseX; MouseY;
 	}
 }
 
-void CreateCube( void )
+char* LoadShaderSourceFromFile( const char* filepath )
 {
-	const Vertex VERTICES[8] =
+	char *data = NULL;
+	FILE *file = NULL;
+	int file_size = 0;
+	
+	if ( NULL != (file = fopen( filepath, "rb" )) &&
+		0 == fseek( file, 0, SEEK_END ) &&
+		-1 != (file_size = ftell( file )) )
 	{
-		{ { -.5f, -.5f, .5f, 1 }, { 0, 0, 1, 1 } },
-		{ { -.5f, .5f, .5f, 1 }, { 1, 0, 0, 1 } },
-		{ { .5f, .5f, .5f, 1 }, { 0, 1, 0, 1 } },
-		{ { .5f, -.5f, .5f, 1 }, { 1, 1, 0, 1 } },
-		{ { -.5f, -.5f, -.5f, 1 }, { 1, 1, 1, 1 } },
-		{ { -.5f, .5f, -.5f, 1 }, { 1, 0, 0, 1 } },
-		{ { .5f, .5f, -.5f, 1 }, { 1, 0, 1, 1 } },
-		{ { .5f, -.5f, -.5f, 1 }, { 0, 0, 1, 1 } }
-	};
+		rewind( file );
+		if ( NULL != (data = (char*)malloc( file_size + 1 )) )
+		{
+			if ( file_size == (long)fread( data, sizeof( char ), file_size, file ) )
+			{
+				data[file_size] = '\0';
+				return data;
+			}
+			else
+				fprintf( stderr, "ERROR: Could not read file %s\n", filepath );
 
-	const GLuint INDICES[36] =
+			free( data );
+		}
+		else
+			fprintf( stderr, "ERROR: Could not allocate %i bytes.\n", file_size );
+
+		fclose( file );
+	}
+	else
 	{
-		0, 2, 1, 0, 3, 2,
-		4, 3, 0, 4, 7, 3,
-		4, 1, 5, 4, 0, 1,
-		3, 6, 2, 3, 7, 6,
-		1, 6, 5, 1, 2, 6,
-		7, 5, 6, 7, 4, 5
-	};
+		if ( NULL != file )
+			fclose( file );
+		fprintf( stderr, "ERROR: Could not open file %s\n", filepath );
+	}
 
-	ShaderIds[0] = glCreateProgram();
-	ExitOnGLError( "ERROR: Could not create the shader program" );
-
-	ShaderIds[1] = LoadShader( "SimpleShader.fragment.glsl", GL_FRAGMENT_SHADER );
-	ShaderIds[2] = LoadShader( "SimpleShader.vertex.glsl", GL_VERTEX_SHADER );
-	glAttachShader( ShaderIds[0], ShaderIds[1] );
-	glAttachShader( ShaderIds[0], ShaderIds[2] );
-
-	glLinkProgram( ShaderIds[0] );
-	ExitOnGLError( "ERROR: Could not link the shader program" );
-
-	ModelMatrixUniformLocation = glGetUniformLocation( ShaderIds[0], "ModelMatrix" );
-	ViewMatrixUniformLocation = glGetUniformLocation( ShaderIds[0], "ViewMatrix" );
-	ProjectionMatrixUniformLocation = glGetUniformLocation( ShaderIds[0], "ProjectionMatrix" );
-	ExitOnGLError( "ERROR: Could not get the shader uniform locations" );
-
-	glGenBuffers( 2, &BufferIds[1] );
-	ExitOnGLError( "ERROR: Could not generate the buffer objects" );
-
-	glGenVertexArrays( 1, &BufferIds[0] );
-	ExitOnGLError( "ERROR: Could not generate the VAO" );
-	glBindVertexArray( BufferIds[0] );
-	ExitOnGLError( "ERROR: Could not bind the VAO" );
-
-	glEnableVertexAttribArray( 0 );
-	glEnableVertexAttribArray( 1 );
-	ExitOnGLError( "ERROR: Could not enable vertex attributes" );
-
-	glBindBuffer( GL_ARRAY_BUFFER, BufferIds[1] );
-	glBufferData( GL_ARRAY_BUFFER, sizeof( VERTICES ), VERTICES, GL_STATIC_DRAW );
-	ExitOnGLError( "ERROR: Could not bind the VBO to the VAO" );
-
-	glVertexAttribPointer( 0, 4, GL_FLOAT, GL_FALSE, sizeof( VERTICES[0] ), (GLvoid*)0 );
-	glVertexAttribPointer( 1, 4, GL_FLOAT, GL_FALSE, sizeof( VERTICES[0] ), (GLvoid*)sizeof( VERTICES[0].Position ) );
-	ExitOnGLError( "ERROR: Could not set VAO attributes" );
-
-	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, BufferIds[2] );
-	glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( INDICES ), INDICES, GL_STATIC_DRAW );
-	ExitOnGLError( "ERROR: Could not bind the IBO to the VAO" );
-
-	glBindVertexArray( 0 );
+	return NULL;
 }
 
-void DestroyCube( void )
+void LoadShaders()
 {
-	glDetachShader( ShaderIds[0], ShaderIds[1] );
-	glDetachShader( ShaderIds[0], ShaderIds[2] );
-	glDeleteShader( ShaderIds[1] );
-	glDeleteShader( ShaderIds[2] );
-	glDeleteProgram( ShaderIds[0] );
-	ExitOnGLError( "ERROR: Could not destroy the shaders" );
+	char* Shader_data[2] = { 0 };
 
-	glDeleteBuffers( 2, &BufferIds[1] );
-	glDeleteVertexArrays( 1, &BufferIds[0] );
-	ExitOnGLError( "ERROR: Could not destroy the buffer objects" );
+	//Load from Shader Files into the "buffers"
+	Shader_data[0] = LoadShaderSourceFromFile( "SimpleShader.vertex.glsl" );
+	Shader_data[1] = LoadShaderSourceFromFile( "SimpleShader.fragment.glsl" );
+	//Create Program
+	ShaderProgram_Ids[0] = glCreateProgram();
+	//Create Shader
+	Shader_Ids[0] = glCreateShader( GL_VERTEX_SHADER );
+	Shader_Ids[1] = glCreateShader( GL_FRAGMENT_SHADER );
+	//Load from Source
+	GLsizei Shader_dataSizes[2];
+	Shader_dataSizes[0] = sizeof( Shader_data[0] );
+	Shader_dataSizes[1] = sizeof( Shader_data[1] );
+	glShaderSource( Shader_Ids[0], 1, &Shader_data[0], &Shader_dataSizes[0]);
+	glShaderSource( Shader_Ids[1], 1, &Shader_data[1], &Shader_dataSizes[1]);
+	//Compile Shader2
+	glCompileShader( Shader_Ids[0] );
+	glCompileShader( Shader_Ids[1] );
+	//Attach Shader
+	glAttachShader( ShaderProgram_Ids[0], Shader_Ids[0] );
+	glAttachShader( ShaderProgram_Ids[0], Shader_Ids[1] );
+	//Link Program with Shaders
+	glLinkProgram( ShaderProgram_Ids[0] );
+	//Use Program
+	glUseProgram( ShaderProgram_Ids[0] );
+
+	free( Shader_data[1] );
+	free( Shader_data[0] );
 }
 
-void DrawCube( void )
+void LoadMesh()
 {
-	float CubeAngle;
-	clock_t Now = clock();
-	if ( LastTime == 0 )
-		LastTime = Now;
+	//Generate VAO
+	//Bind VAO
+	 
 
-	CubeRotation += 45.0f * ((float)(Now - LastTime) / CLOCKS_PER_SEC);
-	CubeAngle = DegreesToRadians( CubeRotation );
-	LastTime = Now;
+	//Generate 3 VBOs
+	//Bind Vertices VBO
+	//Load Vertices to VBO
+	//Bind TextureCoords VBO
+	//Load Texture Coords to VBO
+	//Bind PerVertexColor VBO
+	//Load Per Vertex Colors
 
-	ModelMatrix = IDENTITY_MATRIX;
-	RotateAboutY( &ModelMatrix, CubeAngle );
-	RotateAboutX( &ModelMatrix, CubeAngle );
+	//Set attributes
 
-	glUseProgram( ShaderIds[0] );
-	ExitOnGLError( "ERROR: Could not use the shader program" );
+	//Get pointers to shader inputs
 
-	glUniformMatrix4fv( ModelMatrixUniformLocation, 1, GL_FALSE, ModelMatrix.m );
-	glUniformMatrix4fv( ViewMatrixUniformLocation, 1, GL_FALSE, ViewMatrix.m );
-	ExitOnGLError( "ERROR: Could not set the shader uniforms" );
+	//Link attributes to Shader inputs
 
-	glBindVertexArray( BufferIds[0] );
-	ExitOnGLError( "ERROR: Could not bind the VAO for drawing purposes" );
+	//Bind Vertices VBO
+}
 
-	glDrawElements( GL_TRIANGLES, 36, GL_UNSIGNED_INT, (GLvoid*)0 );
-	ExitOnGLError( "ERROR: Could not draw the cube" );
+void LoadTextures()
+{
+	//Create Texture Buffer
+	//Set it Active
+	//Load from File
 
-	glBindVertexArray( 0 );
-	glUseProgram( 0 );
 }

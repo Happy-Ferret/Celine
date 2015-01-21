@@ -1,0 +1,39 @@
+Vertices------------
+1)
+struct Vertices{
+float positions[99*4]
+float colors[99*4]
+float texturecoords[X]
+int/short indices[3*33]
+} Geometry;
+
+Alignment:
+4bytes/float * 4 floats/position * 99 vertices = 1584bytes positions
+4bytes/float * 4 floats/color * 99 vertices = 1584bytes colors
+4bytes/float * 4 floats/texturecoord * 99 texturecoords = 
+4/2 bytes/index * 3 indexes/triange * 33 triangles = 396bytes / 198bytes indices
+
+
+or
+
+2)
+Vertex{
+float position[4]		// 4bytes/float * 4 floats/position = 16bytes
+float color[4]			// 4bytes/float * 4 floats/color = 16bytes
+float texturecoord[4]	// 4bytes/float * 4 floats/texture coord
+} Vertices[99];
+
+int/short Indices[3*33] // 4/2 bytes/index * 99 indexes
+
+In terms of packing and info usage locality.
+1)	sizeof(Geometry) =  (1584+1584+4XY+396)/(1584+1584+4XY+198) = 4XY + ((1584+1584+396)/(1584+1584+198)) = 4XY + (3564/3366) bytes
+2)	sizeof(Vertices) = (4Y + (16+16))*99 = 396Y + 3168 bytes
+	sizeof(Indeces) = 396bytes / 198bytes
+	So both together equal to ((396Y + 3168 + 396)/(396Y + 3168 + 198)) = 396Y + (3564/3366) bytes
+
+	4X >=< 396
+
+
+
+Conclusion
+Probably the size is the same(5148/4950) ~5kbytes) but what matters is locality and usage.
